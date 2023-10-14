@@ -8,6 +8,24 @@
    body { background: whitesmoke; font-family: Georgia; }
    h1 { background: lightgray; color: black; font-weight: bold; }
    p { background: white; color: dimgray; }
+   .draggable {
+       position: absolute;
+       z-index: 9;
+       background-color: #f1f1f1;
+       text-align: center;
+       border: 1px solid #d3d3d3;
+    }
+    .draggableHeader {
+      padding: 10px;
+      cursor: move;
+      z-index: 10;
+      background-color: #2196F3;
+      color: #fff;
+    }
+    .input {
+      background: transparent;
+      border: none;
+    }
   </style>
  </head>
  
@@ -34,6 +52,80 @@
    }
   </script>
   
+  
+  <p>Click and hold the mouse button down while moving the DIV element</p>
+  
+  <div id="drag1", class="draggable">
+   <div class="draggableHeader">Click here to move</div>
+   <input type="button" onclick="createCheckbox(this.parentNode)" value="new box">
+   <input id="drag1input">
+  </div>
+  
+  <div><input class="input"></div>
+  
+  <script>
+   //Draggable Check-List Things:
+   dragElement(document.getElementById("drag1"));
+   
+   function removeThing(thing) {
+    //Remove This Thing
+    thing.parentNode.parentNode.removeChild(thing.parentNode);
+   }
+   
+   function createCheckbox(location) {
+    //Create New Checkbox Input
+    const newCheck = document.createElement("input");
+    newCheck.type = "checkbox";
+    //Make it Delete Itself When Checked
+    newCheck.setAttribute("onclick", "this.parentNode.parentNode.removeChild(this.parentNode)");
+    
+    //Make New Text to Put Checkbox In
+    const newText = document.createElement("p");
+    newText.appendChild(newCheck)
+    
+    //Give the Text Box it's Text From the Input
+    let text = document.getElementById(location.id + "input").value
+    newText.append(text);
+    
+    //Add New Item to List
+    location.appendChild(newText);
+   }
+   
+   function dragElement(elmnt) {
+    let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+    if (document.getElementById(elmnt.id + "header")) {
+      //Move Element From Header if Present
+      document.getElementById(elmnt.id + "header").onmousedown = dragMouseDown;
+    } else {
+      //Otherwise, Move From Anywhere
+      elmnt.onmousedown = dragMouseDown;
+    }
+    function dragMouseDown(e) {
+      //Get Initial Cursor Position:
+      pos3 = e.clientX;
+      pos4 = e.clientY;
+      document.onmouseup = closeDragElement;
+      //Move Element When Mouse Moves
+      document.onmousemove = elementDrag;
+    }
+    function elementDrag(e) {
+      //Find New Cursor Position:
+      pos1 = pos3 - e.clientX;
+      pos2 = pos4 - e.clientY;
+      pos3 = e.clientX;
+      pos4 = e.clientY;
+      //Move Element to New Location
+      elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+      elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+    }
+    function closeDragElement() {
+      //Stop Moving Once Mouse is Released
+      document.onmouseup = null;
+      document.onmousemove = null;
+    }
+   }
+  </script>
+  
   <!-- <script>
    function changeText(id) {
     id.innerHTML = "[!] My first assignment";
@@ -41,29 +133,25 @@
   </script> -->
 
   
-  <!-- <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore-compat.js"></script>
+  <!-- <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-app-compat.js"></script> -->
+  <!-- <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore-compat.js"></script> -->
   
-  <!-- Insert this script at the bottom of the HTML, but before you use any Firebase services -->
-  <script type="module">
+  <!-- Insert this script at the bottom of the HTML -->
+  <!-- <script type="module">
    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js'
    
-   // If you enabled Analytics in your project, add the Firebase SDK for Google Analytics
    import { getAnalytics } from 'https://www.gstatic.com/firebasejs/10.4.0/firebase-analytics.js'
    
-   // Add Firebase products that you want to use
    import { getAuth } from 'https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js'
    import { getFirestore } from 'https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js'
-
 
    // Pasted/inserted from a documentation article. There are a lot of imports to do but get ready for things to start happening...
    import firebase from "firebase/compat/app";
    // Required for side-effects
    import "firebase/firestore";
-  </script>
+  </script> -->
   
-  <script type="module">
-    // ...
+  <!-- <script type="module">
    
     const firebaseConfig = {
       apiKey: "AIzaSyDLuXHdz2mZmxGllkKIdAP3XItAqhsuhMY",
@@ -78,9 +166,9 @@
     // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-  </script>
+  </script> -->
 
-  <script>
+  <!-- <script>
    db.collection("users").add({
     first: "Ada",
     last: "Lovelace",
@@ -93,7 +181,7 @@
     console.error("Error adding document: ", error);
    });
   </script> -->
-
+  
   
  </body>
  
