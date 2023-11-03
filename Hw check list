@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homework Checklist</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        #homework-list {
+            width: 300px;
+            margin: 0 auto;
+            position: absolute;
+            top: 50px;
+            left: 50px;
+            cursor: grab;
+        }
+        #homework-list:active {
+            cursor: grabbing;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .urgent {
+            background-color: #FF6347;
+        }
+    </style>
+</head>
+<body>
+    <div id="homework-list" draggable="true">
+        <h1>Homework Checklist</h1>
+        <div>
+            <input type="text" id="task" placeholder="Enter homework task">
+            <input type="date" id="due-date">
+            <select id="priority">
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+            </select>
+            <button onclick="addTask()">Add Task</button>
+        </div>
+        <ul id="tasks">
+        </ul>
+    </div>
+
+    <script>
+        // Drag and drop functionality
+        const homeworkList = document.getElementById("homework-list");
+
+        let offsetX, offsetY;
+
+        homeworkList.addEventListener("dragstart", (e) => {
+            e.dataTransfer.setData("text/plain", "HomeworkList");
+            offsetX = e.clientX - homeworkList.getBoundingClientRect().left;
+            offsetY = e.clientY - homeworkList.getBoundingClientRect().top;
+        });
+
+        document.addEventListener("dragover", (e) => {
+            e.preventDefault();
+        });
+
+        document.addEventListener("drop", (e) => {
+            if (e.dataTransfer.getData("text/plain") === "HomeworkList") {
+                e.preventDefault();
+                const x = e.clientX - offsetX;
+                const y = e.clientY - offsetY;
+                homeworkList.style.left = `${x}px`;
+                homeworkList.style.top = `${y}px`;
+            }
+        });
+
+        // Homework list functions (unchanged)
+        function addTask() {
+            const taskInput = document.getElementById("task");
+            const dueDateInput = document.getElementById("due-date");
+            const priorityInput = document.getElementById("priority");
+
+            const task = taskInput.value;
+            const dueDate = dueDateInput.value;
+            const priority = priorityInput.value;
+
+            if (task.trim() === "") {
+                alert("Task name cannot be empty");
+                return;
+            }
+
+            const taskList = document.getElementById("tasks");
+            const listItem = document.createElement("li");
+
+            if (priority === "high") {
+                listItem.classList.add("urgent");
+            }
+
+            listItem.innerHTML = `
+                <span>${task} (Due: ${dueDate})</span>
+                <button onclick="deleteTask(this)">Delete</button>
+            `;
+            taskList.appendChild(listItem);
+
+            taskInput.value = "";
+            dueDateInput.value = "";
+            priorityInput.value = "low";
+        }
+
+        function deleteTask(button) {
+            const taskList = document.getElementById("tasks");
+            taskList.removeChild(button.parentNode);
+        }
+    </script>
+</body>
+</html>
+
