@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<title>Homework Checklist</title>
+	<style>
+		:root,
+		:root {
+			--background-color: #f5f5f5;
+			--midground-color: #d3d3d3;
+			--foreground-color: #808080;
+			--border-color: #696969;
+			//--highlight-color: #00ffff;
+			--text-color: #000000;
+		}
+		body { background: var(--background-color); font-family: Arial, sans-serif;}
+		h1 { background: var(--midground-color); color: var(--text-color); font-weight: bold; margin-bottom: 0;}
+		p { background: var(--midground-color); color: var(--text-color); text-align: left; margin-top: 0; margin-bottom: 0;}
+		#homework-list {
+			width: 300px;
+			margin: 0 auto;
+			position: absolute;
+			top: 50px;
+			left: 50px;
+			cursor: grab;
+		}
+		ul {
+			list-style-type: none;
+			padding: 0;
+		}
+		li {
+			margin: 5px 0;
+			border: 1px solid #ccc;
+			padding: 10px;
+			display: flex;
+			justify-content: space-between;
+		}
+		.container { background: var(--midground-color); border: 2px solid var(--border-color);}
+		.input { background: transparent; border: none;}
+		.urgent { background-color: #FF6347;}
+	</style>
+</head>
+
+<body>
+
+	<div class="container">
+		<h1>MePlan</h1>
+		<p>Welcome to MePlan, the most intuitive place to plan your work/life.</p>
+		<button onclick="showSettingsMenu()">Settings</button>
+	</div>
+
+	<div class="container">
+		<h1>Homework Checklist</h1>
+		<div>
+			<input class="input" type="text" id="task" placeholder="Enter homework task">
+			<input type="date" id="due-date">
+			<select id="priority">
+				<option value="low">Low</option>
+				<option value="high">High</option>
+			</select>
+			<button onclick="addTask()">Add Task</button>
+		</div>
+		<ul id="tasks">
+		</ul>
+	</div>
+
+	<div id="settings" style="visibility:hidden; position:absolute; top:50px; right:50px; width:50%; height:50%; z-index:1000; background-color:var(--foreground-color);">
+		<h1>Settings</h1>
+		<button type="button" onclick="toggleTheme()">Toggle Theme</button>
+		<p>Background Color: <input type="color" value="#f5f5f5" onblur="changeColor('--background-color',this.value)"></p>
+		<p>Midground Color: <input type="color" value="#d3d3d3" onblur="changeColor('--midground-color',this.value)"></p>
+		<p>Foreground Color: <input type="color" value="#808080" onblur="changeColor('--foreground-color',this.value)"></p>
+		<p>Border Color: <input type="color" value="#696969" onblur="changeColor('--border-color',this.value)"></p>
+		<p>Text Color: <input type="color" value="#000000" onblur="changeColor('--text-color',this.value)"></p>
+	</div>
+
+	<script>
+
+	// homework list functions
+	function addTask() {
+		const taskInput = document.getElementById("task");
+		const dueDateInput = document.getElementById("due-date");
+		const priorityInput = document.getElementById("priority");
+		const task = taskInput.value;
+		const dueDate = dueDateInput.value;
+
+		const priority = priorityInput.value;
+		const taskList = document.getElementById("tasks");
+		const listItem = document.createElement("li");
+
+		if (priority === "high") {
+			listItem.classList.add("urgent");
+		}
+
+		listItem.innerHTML = `
+			<span>${task} (Due: ${dueDate})</span>
+			<button onclick="deleteTask(this)">Delete</button>
+		`
+
+		taskList.appendChild(listItem);
+
+		taskInput.value = "";
+		dueDateInput.value = "";
+		priorityInput.value = "low";
+	}
+
+	function deleteTask(button) {
+		const taskList = document.getElementById("tasks");
+		taskList.removeChild(button.parentNode);
+	}
+
+	</script>
+
+	<script>
+
+	function showSettingsMenu() {
+		let settings = document.getElementById("settings");
+		if(settings.style.visibility==="hidden") {
+			settings.style.visibility = "visible";
+		} else {
+			settings.style.visibility = "hidden";
+		}
+	}
+
+	function toggleTheme() {
+		let root = document.documentElement;
+		if (root.style.getPropertyValue('--background-color') === '#f5f5f5') {
+			// Sets dark mode if currently in light mode
+			changeColor('--background-color', '#0d1321');
+			changeColor('--midground-color', '#1d2d44');
+			changeColor('--foreground-color', '#3e5c76');
+			changeColor('--border-color', '#748cab');
+			//changeColor('--highlight-color', '#023e8a');
+			changeColor('--text-color', '#f0ebd8');
+		} else {
+			// Otherwise sets light mode
+			changeColor('--background-color', '#f5f5f5');
+			changeColor('--midground-color', '#d3d3d3');
+			changeColor('--foreground-color', '#808080');
+			changeColor('--border-color', '#696969');
+			//changeColor('--highlight-color', '#00ffff');
+			changeColor('--text-color', '#000000');
+		}
+	}
+
+	function changeColor(color, value) {
+		let root = document.documentElement;
+		root.style.setProperty(color, value);
+	}
+
+	</script>
+</body>
+
+</html>
