@@ -1,188 +1,226 @@
 <!DOCTYPE html>
 <html lang="en">
- 
- <head>
+<head>
   <title>HCI Project</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎯</text></svg>">
   <style>
-   body { background: whitesmoke; font-family: Georgia; }
-   h1 { background: lightgray; color: black; font-weight: bold; }
-   p { background: white; color: dimgray; }
-   .draggable {
-       position: absolute;
-       z-index: 9;
-       background-color: #f1f1f1;
-       text-align: center;
-       border: 1px solid #d3d3d3;
+
+    /*------------------ General Settings ------------------*/
+    :root,
+    :root {
+      --background-color: #f5f5f5;
+      --midground-color: #d3d3d3;
+      --foreground-color: #808080;
+      --border-color: #696969;
+      --highlight-color: #00ffff;
+      --urgent-color: #FF6347;
+      --upcoming-color: #FACF42;
+      --text-color: #000000;
+      --dates-visibility: visible;
     }
-    .draggableHeader {
-      padding: 10px;
-      cursor: move;
-      z-index: 10;
-      background-color: #2196F3;
-      color: #fff;
+
+    body { background: var(--background-color); font-family: Arial, sans-serif;}
+    h1 { background: var(--midground-color); color: var(--text-color); font-weight: bold; margin-bottom: 0;}
+    p { background: var(--midground-color); color: var(--text-color); text-align: left; margin-top: 0; margin-bottom: 0;}
+
+    .container { background: var(--midground-color); border: 2px solid var(--border-color);}
+
+
+    /*------------------ Homework List Stuff ------------------*/
+
+    #homework-list {
+      width: 20%;
+      margin: 0 auto;
+      position: absolute;
+      border: 2px solid var(--border-color);
+      background-color: var(--midground-color);
+      left: 50px;
+      cursor: grab;
     }
-    .input {
-      background: transparent;
-      border: none;
+    #homework-list:active {
+      cursor: grabbing;
     }
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
+    li {
+      color: var(--text-color);
+      padding: 15px;
+      display: flex;
+      justify-content: space-between;
+    }
+    ul :hover {
+      background-color: var(--highlight-color);
+    }
+    .urgent {
+      background-color: var(--urgent-color);
+    }
+    .upcoming {
+      background-color: var(--upcoming-color);
+    }
+
   </style>
- </head>
- 
- <body>
-  
+</head>
+<body>
+
+<div class="container">
   <h1>MePlan</h1>
-  <p>Welcome to MePlan, the most intuitive place to plan your work/life.</p>
-  <button onclick="window.location.href='https://cs-hci-group8.github.io/moveableChecklist.html'">Moveable Checklist Test</button>
-  <p id="demo">To-do</p>
-  <!-- <button type="button" onclick='document.getElementById("demo").innerHTML = "Done!"'>Finished?</button> -->
-  <!-- <p onclick="changeText(this)">[?] (Clickable text)</p> -->
-  <form>
-   <input type="text" id="textInput">
-   <input type="button" onclick="addElement()">
-  </form>
+  <p>Welcome to MePlan, the most customizable place to plan your work/life.</p>
+  <button onclick="showSettingsMenu()">Settings</button>
+</div>
 
-  
-  <script>
-   function addElement() {
-    let inputValue = document.getElementById('textInput').value;
-    let p = document.createElement('p');
-    p.textContent = inputValue
-    document.body.appendChild(p);
-   }
-  </script>
-  
-  
-  <p>Click and hold the mouse button down while moving the DIV element</p>
-  
-  <div id="drag1", class="draggable">
-   <div class="draggableHeader">Click here to move</div>
-   <input type="button" onclick="createCheckbox(this.parentNode)" value="new box">
-   <input id="drag1input">
+<div id="settings" style="visibility:hidden; position:absolute; top:50px; right:50px; width:50%; height:50%; z-index:1000; background-color:var(--foreground-color);">
+  <div style="margin: 30px;">
+    <h1>Settings</h1>
+    <button type="button" onclick="toggleTheme()">Toggle Theme</button>
+    <p>Background Color: <input type="color" value="#f5f5f5" onblur="changeColor('--background-color',this.value)"></p>
+    <p>Midground Color: <input type="color" value="#d3d3d3" onblur="changeColor('--midground-color',this.value)"></p>
+    <p>Foreground Color: <input type="color" value="#808080" onblur="changeColor('--foreground-color',this.value)"></p>
+    <p>Border Color: <input type="color" value="#696969" onblur="changeColor('--border-color',this.value)"></p>
+    <p>Highlight Color: <input type="color" value="#00ffff" onblur="changeColor('--highlight-color',this.value)"></p>
+    <p>Urgent Assignment Color: <input type="color" value="#FF6347" onblur="changeColor('--urgent-color',this.value)"></p>
+    <p>Upcoming Assignment Color: <input type="color" value="#FACF42" onblur="changeColor('--upcoming-color',this.value)"></p>
+    <p>Text Color: <input type="color" value="#000000" onblur="changeColor('--text-color',this.value)"></p>
+    <p>List Width: <input type="range" value="20" onblur="changeWidth(this.value)"></p>
   </div>
-  
-  <div><input class="input"></div>
-  
-  <script>
-   //Draggable Check-List Things:
-   dragElement(document.getElementById("drag1"));
-   
-   function removeThing(thing) {
-    //Remove This Thing
-    thing.parentNode.parentNode.removeChild(thing.parentNode);
-   }
-   
-   function createCheckbox(location) {
-    //Create New Checkbox Input
-    const newCheck = document.createElement("input");
-    newCheck.type = "checkbox";
-    //Make it Delete Itself When Checked
-    newCheck.setAttribute("onclick", "this.parentNode.parentNode.removeChild(this.parentNode)");
-    
-    //Make New Text to Put Checkbox In
-    const newText = document.createElement("p");
-    newText.appendChild(newCheck)
-    
-    //Give the Text Box it's Text From the Input
-    let text = document.getElementById(location.id + "input").value
-    newText.append(text);
-    
-    //Add New Item to List
-    location.appendChild(newText);
-   }
-   
-   function dragElement(elmnt) {
-    let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-    if (document.getElementById(elmnt.id + "header")) {
-      //Move Element From Header if Present
-      document.getElementById(elmnt.id + "header").onmousedown = dragMouseDown;
+</div>
+
+<div id="homework-list" draggable="true" style="background-color: var(--midground-color)">
+  <h1>Homework Checklist</h1>
+  <div style="background-color: var(--midground-color)">
+    <input type="text" id="task" placeholder="Enter homework task">
+    <input type="date" id="due-date">
+    <select id="priority">
+      <option value="low">Low</option>
+      <option value="medium">Medium</option>
+      <option value="high">High</option>
+    </select>
+    <button onclick="addTask()">Add Task</button>
+  </div>
+  <ul id="tasks">
+  </ul>
+</div>
+
+<script>
+
+  //------------------ Settings Menu ------------------//
+
+  function showSettingsMenu() {
+    let settings = document.getElementById("settings");
+    if(settings.style.visibility==="hidden") {
+      settings.style.visibility = "visible";
     } else {
-      //Otherwise, Move From Anywhere
-      elmnt.onmousedown = dragMouseDown;
+      settings.style.visibility = "hidden";
     }
-    function dragMouseDown(e) {
-      //Get Initial Cursor Position:
-      pos3 = e.clientX;
-      pos4 = e.clientY;
-      document.onmouseup = closeDragElement;
-      //Move Element When Mouse Moves
-      document.onmousemove = elementDrag;
+  }
+  //Toggles Theme
+  function toggleTheme() {
+    let root = document.documentElement;
+    if (root.style.getPropertyValue('--background-color') === '#f5f5f5') {
+      //Sets dark mode if currently in light mode
+      changeColor('--background-color', '#0d1321');
+      changeColor('--midground-color', '#1d2d44');
+      changeColor('--foreground-color', '#3e5c76');
+      changeColor('--border-color', '#748cab');
+      changeColor('--highlight-color', '#023e8a');
+      changeColor('--urgent-color', '#721817');
+      changeColor('--upcoming-color', '#CE8147');
+      changeColor('--text-color', '#f0ebd8');
+    } else {
+      //Otherwise sets light mode
+      changeColor('--background-color', '#f5f5f5');
+      changeColor('--midground-color', '#d3d3d3');
+      changeColor('--foreground-color', '#808080');
+      changeColor('--border-color', '#696969');
+      changeColor('--highlight-color', '#00ffff');
+      changeColor('--urgent-color', '#FF6347');
+      changeColor('--upcoming-color', '#FACF42');
+      changeColor('--text-color', '#000000');
     }
-    function elementDrag(e) {
-      //Find New Cursor Position:
-      pos1 = pos3 - e.clientX;
-      pos2 = pos4 - e.clientY;
-      pos3 = e.clientX;
-      pos4 = e.clientY;
-      //Move Element to New Location
-      elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
-      elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
-    }
-    function closeDragElement() {
-      //Stop Moving Once Mouse is Released
-      document.onmouseup = null;
-      document.onmousemove = null;
-    }
-   }
-  </script>
-  
-  <!-- <script>
-   function changeText(id) {
-    id.innerHTML = "[!] My first assignment";
-   }
-  </script> -->
+  }
+  //Change color of a given element
+  function changeColor(color, value) {
+    let root = document.documentElement;
+    root.style.setProperty(color, value);
+  }
+  //Change Width of Assignments Checklist
+  function changeWidth(value) {
+    let assignmentList = document.getElementById("homework-list");
+    assignmentList.style = "width: " + value + "%";
+  }
 
-  
-  <!-- <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-app-compat.js"></script> -->
-  <!-- <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore-compat.js"></script> -->
-  
-  <!-- Insert this script at the bottom of the HTML -->
-  <!-- <script type="module">
-   import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js'
-   
-   import { getAnalytics } from 'https://www.gstatic.com/firebasejs/10.4.0/firebase-analytics.js'
-   
-   import { getAuth } from 'https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js'
-   import { getFirestore } from 'https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js'
+  //------------------ Draggable Checklist ------------------//
 
-   // Pasted/inserted from a documentation article. There are a lot of imports to do but get ready for things to start happening...
-   import firebase from "firebase/compat/app";
-   // Required for side-effects
-   import "firebase/firestore";
-  </script> -->
-  
-  <!-- <script type="module">
-   
-    const firebaseConfig = {
-      apiKey: "AIzaSyDLuXHdz2mZmxGllkKIdAP3XItAqhsuhMY",
-      authDomain: "hci-planner-2023.firebaseapp.com",
-      projectId: "hci-planner-2023",
-      storageBucket: "hci-planner-2023.appspot.com",
-      messagingSenderId: "110333384674",
-      appId: "1:110333384674:web:3477019ed9316699018bbb",
-      measurementId: "G-RH7JYVTZRS"
-    };
-   
-    // Initialize Firebase
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-  </script> -->
+  // Drag and drop functionality
+  const homeworkList = document.getElementById("homework-list");
+  let offsetX, offsetY;
 
-  <!-- <script>
-   db.collection("users").add({
-    first: "Ada",
-    last: "Lovelace",
-    born: 1815
-   })
-   .then((docRef) => {
-    console.log("Document written with ID: ", docRef.id);
-   })
-   .catch((error) => {
-    console.error("Error adding document: ", error);
-   });
-  </script> -->
-  
-  
- </body>
- 
+  //Start Drag
+  homeworkList.addEventListener("dragstart", (e) => {
+    e.dataTransfer.setData("text/plain", "HomeworkList");
+    offsetX = e.clientX - homeworkList.getBoundingClientRect().left;
+    offsetY = e.clientY - homeworkList.getBoundingClientRect().top;
+  });
+
+  //End Drag
+  document.addEventListener("dragover", (e) => {
+    e.preventDefault();
+  });
+
+  //Drop HW List
+  document.addEventListener("drop", (e) => {
+    if (e.dataTransfer.getData("text/plain") === "HomeworkList") {
+      e.preventDefault();
+      const x = e.clientX - offsetX;
+      const y = e.clientY - offsetY;
+      homeworkList.style.left = `${x}px`;
+      homeworkList.style.top = `${y}px`;
+    }
+  });
+
+  //------------------ Checklist Functions ------------------//
+
+  // Homework list functions (unchanged)
+  function addTask() {
+    const taskInput = document.getElementById("task");
+    const dueDateInput = document.getElementById("due-date");
+    const priorityInput = document.getElementById("priority");
+
+    const task = taskInput.value;
+    const dueDate = dueDateInput.value;
+    const priority = priorityInput.value;
+
+    if (task.trim() === "") {
+      alert("Task name cannot be empty");
+      return;
+    }
+
+    const taskList = document.getElementById("tasks");
+    const listItem = document.createElement("li");
+
+    if (priority === "high") {
+      listItem.classList.add("urgent");
+    } else if (priority === "medium") {
+      listItem.classList.add("upcoming");
+    }
+
+    listItem.innerHTML = `<span>${task} (Due: ${dueDate})</span>
+        <button onclick="deleteTask(this)">Delete</button>`;
+    taskList.appendChild(listItem);
+
+    taskInput.value = "";
+    dueDateInput.value = "";
+    priorityInput.value = "low";
+  }
+
+  //------------------ Other ------------------//
+
+  //Delete Item
+  function deleteTask(button) {
+    const taskList = document.getElementById("tasks");
+    taskList.removeChild(button.parentNode);
+  }
+</script>
+</body>
 </html>
